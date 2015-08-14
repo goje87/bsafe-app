@@ -1,0 +1,27 @@
+{
+  "name": "bsafe",
+  "version": "0.0.1",
+  "description": "Drive Analysis",
+  "main": "index.js",
+  "keywords": [
+    "safe",
+    "drive"
+  ],
+  "authors": [
+    "me@goje87.com",
+    "1rohittiwari@gmail.com"
+  ],
+  "license": "MIT",
+  "homepage": "http://goje87.com/bsafe",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "jquery": "~2.1.4"
+  }
+}
