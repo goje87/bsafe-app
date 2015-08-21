@@ -1,0 +1,22 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+
+<dom-module id="bs-acc">
+  <script>
+  Polymer({
+    is: 'bs-acc',
+    _outerWorld: window.parent,
+
+    startListening: function(onReading) {
+      this._outerWorld.postMessage('accelerometer-start', '*');
+      window.addEventListener('accelerometer-reading', function(ev) {
+        console.log(ev);
+      }, false);
+    },
+
+    stopListening: function() {
+      // this._outerWorld.postMessage('accelerometer-stop');
+      // window.removeEventListener('accelerometer-reading');
+    }
+  });
+  </script>
+</dom-module>

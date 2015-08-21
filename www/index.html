@@ -4,37 +4,27 @@
     <meta charset="utf-8" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
-    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://fonts.gstatic.com http://goje87.com 'unsafe-inline'; style-src 'self' http://*.googleapis.com https://*.googleapis.com 'unsafe-inline'; media-src *; frame-src http://localhost:8080; script-src 'self' 'unsafe-inline'">
 
     <link rel="stylesheet" type="text/css" href="css/index.css" />
-    <link rel="stylesheet" type="text/css" href="css/c3.css" />
 
-    <script src="/components/webcomponentsjs/webcomponents-lite.min.js"></script>
-    <script src="js/jquery.js"></script>
-    <script src="js/canvas.js"></script>
+    <script src="components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
+    <link rel="import" href="/components/paper-toolbar/paper-toolbar.html" />
+    <link rel="import" href="/components/paper-tabs/paper-tabs.html" />
+    <link rel="import" href="/components/paper-fab/paper-fab.html" />
     <link rel="import" href="/components/pages/pg-home.html" />
+    <link rel="import" href="/components/bs-ride-button/bs-ride-button.html" />
+
+    <link rel="import" href="/themes/dark-side.html" />
   </head>
-  <body>
-    <h1> HELLo </h1>
-    <button class="ssButton">Start / Stop</button>
-    <div class="acc-output"></div>
-    <div class="acc-post-resp"></div>
-
-    <!-- <div class="acc-graph" id="acc-graph-x"></div>
-    <div class="acc-graph" id="acc-graph-y"></div>
-    <div class="acc-graph" id="acc-graph-z"></div> -->
-    <div class="acc-graph" id="acc-graph-abs"></div>
-
-    <pg-home></pg-home>
-
-    YO YO
-    <script type="text/javascript" src="cordova.js"></script>
-    <script type="text/javascript" src="js/index.js"></script>
-    <script type="text/javascript">
-        alert(parseInt(Math.random()*100));
-        app.initialize();
-    </script>
+  <body class="fullbleed layout vertical">
+    <paper-header-panel class="flex">
+      <paper-toolbar>
+        <div>Hello World!</div>
+      </paper-toolbar>
+      <bs-ride-button></bs-ride-button>
+    </paper-header-panel>
   </body>
 </html>

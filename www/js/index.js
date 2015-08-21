@@ -45,6 +45,9 @@ var app = {
         switch(id) {
           case 'deviceready':
             app.bindHandlers();
+            // server.start(function(base) {
+            //   window.location.href = base;
+            // });
         }
     },
 
@@ -57,6 +60,45 @@ var app = {
       });
     }
 };
+
+var server = (function(G) {
+  var httpd = null,
+      base = '';
+
+  return {
+    start: function(callback) {
+      try {
+        httpd = cordova.plugins.CorHttpd;
+
+        httpd.getURL(function(url) {
+          // if url is an empty string, means server hasn't started yet.
+          if(!url.length) {
+            httpd.startServer({
+              www_root: '',
+              port: 8080,
+              localhost_only: false
+
+            }, function(url) {
+              base = url;
+              callback? callback(url) : '';
+            }, function(err) {
+              throw err;
+            });
+          }
+
+        });
+      }
+      catch (err) {
+        console.error(err);
+      }
+    },
+
+    stop: function() {
+      if(!httpd) throw 'Cannot stop the server that isn\'t running.';
+      httpd.stopServer(function() {}, function(err) { throw err; });
+    }
+  }
+})(this);
 
 
 var accelerometer = {
@@ -79,7 +121,6 @@ var accelerometer = {
 
   startRecording: function() {
     if(this.isRecording === true) return;
-    alert('will start recording');
 
     // Starting accelerometer
     this.id = parseInt(Math.random()*1000000);
@@ -157,7 +198,6 @@ var accelerometer = {
 
   stopRecording: function() {
     if(this.isRecording === false) return;
-    alert('will stop recording');
     this.id = 34;
     // clear watch
     navigator.accelerometer.clearWatch(this.watch);

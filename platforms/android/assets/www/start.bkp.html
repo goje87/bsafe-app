@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/c3.css" />
+
+    <script src="components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/canvas.js"></script>
+
+    <link rel="import" href="components/pages/pg-home.html" />
+  </head>
+  <body>
+    <h1> HELLo </h1>
+    <button class="ssButton">Start / Stop</button>
+    <div class="acc-output"></div>
+    <div class="acc-post-resp"></div>
+
+    <!-- <div class="acc-graph" id="acc-graph-x"></div>
+    <div class="acc-graph" id="acc-graph-y"></div>
+    <div class="acc-graph" id="acc-graph-z"></div> -->
+    <div class="acc-graph" id="acc-graph-abs"></div>
+
+    <pg-home></pg-home>
+
+    YO YO
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+  </body>
+</html>

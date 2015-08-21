@@ -13,11 +13,15 @@
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Accelerometer\"><param name=\"android-package\" value=\"org.apache.cordova.devicemotion.AccelListener\" /></feature>",
+                            "xml": "<feature name=\"Compass\"><param name=\"android-package\" value=\"org.apache.cordova.deviceorientation.CompassListener\" /></feature>",
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Compass\"><param name=\"android-package\" value=\"org.apache.cordova.deviceorientation.CompassListener\" /></feature>",
+                            "xml": "<feature name=\"CorHttpd\"><param name=\"android-package\" value=\"com.rjfun.cordova.httpd.CorHttpd\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Accelerometer\"><param name=\"android-package\" value=\"org.apache.cordova.devicemotion.AccelListener\" /></feature>",
                             "count": 1
                         }
                     ]
@@ -33,6 +37,14 @@
                         {
                             "xml": "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />",
                             "count": 2
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.INTERNET\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+                            "count": 1
                         }
                     ]
                 }
@@ -43,13 +55,16 @@
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.phonegap.helloworld"
         },
-        "cordova-plugin-device-motion": {
-            "PACKAGE_NAME": "com.phonegap.helloworld"
-        },
         "org.apache.cordova.geolocation": {
             "PACKAGE_NAME": "com.goje87.bsafe"
         },
         "cordova-plugin-device-orientation": {
+            "PACKAGE_NAME": "com.goje87.bsafe"
+        },
+        "com.rjfun.cordova.httpd": {
+            "PACKAGE_NAME": "com.goje87.bsafe"
+        },
+        "cordova-plugin-device-motion": {
             "PACKAGE_NAME": "com.goje87.bsafe"
         }
     },
