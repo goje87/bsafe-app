@@ -1,14 +1,14 @@
 <link rel="import" href="/components/polymer/polymer.html" />
 
-<dom-module id="bs-acc">
+<dom-module id="bs-sensors">
   <script>
   Polymer({
-    is: 'bs-acc',
+    is: 'bs-sensors',
     _outerWorld: window.parent,
 
     startListening: function(onReading) {
-      this._outerWorld.postMessage('accelerometer-start', '*');
-      window.addEventListener('accelerometer-reading', function(ev) {
+      this._outerWorld.postMessage('sensors-start', '*');
+      window.addEventListener('sensors-reading', function(ev) {
         console.log(ev);
       }, false);
     },

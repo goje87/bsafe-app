@@ -20,6 +20,9 @@ bower_components
 Android/bin/
 Android/gen/
 Android/assets/
+platform/android/bin/
+platform/android/gen/
+platform/android/assets/
 
 # generated files
 bin/

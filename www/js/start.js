@@ -63,8 +63,8 @@ var app = {
     onMessage: function(ev) {
       var message = ev.data;
       ({
-        'accelerometer-start': accelerometer.start,
-        'accelerometer-stop': accelerometer.stop
+        'sensors-start': accelerometer.start,
+        'sensors-stop': accelerometer.stop
       })[message]();
     }
 };
@@ -130,7 +130,7 @@ var accelerometer = (function(G) {
     var mainframe = document.querySelector('.mainframe'),
         mainframeWin = mainframe.contentWindow || mainframe;
     mainframeWin.postMessage({
-      type: 'accelerometer-reading',
+      type: 'sensors-reading',
       data: acc
     }, '*');
   }
