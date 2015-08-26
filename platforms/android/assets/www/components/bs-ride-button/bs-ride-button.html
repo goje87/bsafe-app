@@ -1,0 +1,148 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/components/iron-icons/iron-icons.html" />
+<link rel="import" href="/components/iron-icons/av-icons.html" />
+<link rel="import" href="/components/paper-fab/paper-fab.html" />
+
+<dom-module id="bs-ride-button">
+  <style>
+    paper-fab {
+      vertical-align: middle;
+      margin: 0 10px;
+    }
+  </style>
+  <template>
+    <iron-ajax
+        id="endpoint"
+        method="POST"
+        url="http://192.168.43.44:3000"
+        handle-as="json"
+        debounce-duration="100">
+    </iron-ajax>
+    <span>{{rideId}}</span>
+    / <span>{{tagId}}</span>
+    <paper-fab mini icon="{{tagIconName}}" on-click="toggleTag"></paper-fab>
+    <paper-fab icon="{{iconName}}" on-click="toggleRecording"></paper-fab>
+  </template>
+  <script>
+  Polymer({
+    is: 'bs-ride-button',
+    _isRecording: false,
+    tagId: null,
+    _tagIdCounter: 1,
+    tagIconName: 'icons:label-outline',
+
+    ready: function() {
+      console.log(this.is + ' is ready');
+      this.isRecording(false);
+    },
+
+    toggleRecording: function() {
+      if(this.isRecording()) this.stopRecording();
+      else this.startRecording();
+    },
+
+    startRecording: function() {
+      if(this.isRecording()) return; // already running
+
+      this.rideId = parseInt(Math.random()*100000);
+      // start watching accelerometer
+      this.accelerometer.startWatching(this.onReading.bind(this), this.onError.bind(this));
+
+      this.isRecording(true);
+    },
+
+    stopRecording: function() {
+      if(!this.isRecording()) return; // already stopped
+
+      // stop watching accelerometer
+      this.accelerometer.stopWatching();
+
+      this.isRecording(false);
+      this.endTag();
+    },
+
+    isRecording: function(value) {
+      // getter: Simply return the recording status
+      if(typeof(value) === 'undefined') return this._isRecording;
+
+      // setter: Set the value for status and also update icon
+      this._isRecording = !!value;
+      this.iconName = this._isRecording ? 'av:pause' : 'av:play-arrow';
+    },
+
+    onReading: function(acc) {
+      console.log(acc);
+      var endpoint = this.$.endpoint;
+      endpoint.params = {
+        accX: acc.x,
+        accY: acc.y,
+        accZ: acc.z,
+        timestamp: acc.timestamp,
+        rideID: this.rideId,
+        tagID: this.tagId? this.tagId: 999999
+      };
+      endpoint.generateRequest();
+    },
+
+    onError: function(err) {
+      console.error(err);
+    },
+
+    toggleTag: function() {
+      if(this.tagId) this.endTag();
+      else this.startTag();
+    },
+
+    startTag: function() {
+      if(this.tagId) {
+        alert('tag already recording');
+        return;
+      }
+
+      if(!this.isRecording()) {
+        alert('No ride is being recorded');
+        return;
+      }
+
+      this.tagId = this._tagIdCounter++;
+      this.tagIconName = 'icons:label';
+    },
+
+    endTag: function() {
+      if(!this.tagId) return;
+
+      this.tagId = null;
+      this.tagIconName = 'icons:label-outline';
+    },
+
+    accelerometer: {
+      _watchId: null,
+      _config: {
+        frequency: 300 // milliseconds
+      },
+      startWatching: function(onReading, onError) {
+        // if(!navigator || !navigator.accelerometer) return;
+        //
+        // this._watchId = navigator.accelerometer.watchAcceleration(onReading, onError, this._config);
+        window.parent.postMessage('sensors-start', '*');
+        window.addEventListener('message', function(ev) {
+          var message = ev.data,
+              type = message.type,
+              data = message.data;
+          if(type === 'sensors-reading') {
+            onReading(data);
+          }
+        }.bind(this), false);
+      },
+
+      stopWatching: function() {
+        // if(!navigator || !navigator.accelerometer) return;
+        //
+        // navigator.accelerometer.clearWatch(this._watchId);
+        window.parent.postMessage('sensors-stop', '*');
+      }
+    }
+  });
+  </script>
+</dom-module>
