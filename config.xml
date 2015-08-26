@@ -2,10 +2,10 @@
 <widget id="com.goje87.bsafe" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>Bsafe</name>
     <description>
-        Hello World sample application that responds to the deviceready event.
+        Making a safe driving habit...
     </description>
-    <author email="support@phonegap.com" href="http://phonegap.com">
-        PhoneGap Team
+    <author email="me@goje87.com" href="http://goje87.com">
+        Bsafe Team
     </author>
     <content src="start.html" />
     <preference name="permissions" value="none" />
