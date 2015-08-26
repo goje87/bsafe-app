@@ -46,8 +46,8 @@
       if(this.isRecording()) return; // already running
 
       this.rideId = parseInt(Math.random()*100000);
-      // start watching accelerometer
-      this.accelerometer.startWatching(this.onReading.bind(this), this.onError.bind(this));
+      // start watching sensors
+      this.sensors.startWatching(this.onReading.bind(this), this.onError.bind(this));
 
       this.isRecording(true);
     },
@@ -55,8 +55,8 @@
     stopRecording: function() {
       if(!this.isRecording()) return; // already stopped
 
-      // stop watching accelerometer
-      this.accelerometer.stopWatching();
+      // stop watching sensors
+      this.sensors.stopWatching();
 
       this.isRecording(false);
       this.endTag();
@@ -71,14 +71,24 @@
       this.iconName = this._isRecording ? 'av:pause' : 'av:play-arrow';
     },
 
-    onReading: function(acc) {
-      console.log(acc);
-      var endpoint = this.$.endpoint;
+    onReading: function(reading) {
+      console.log(reading);
+      var endpoint = this.$.endpoint,
+          acc = reading.acceleration || {},
+          geo = reading.position || {};
+
       endpoint.params = {
         accX: acc.x,
         accY: acc.y,
         accZ: acc.z,
-        timestamp: acc.timestamp,
+        timestamp: reading.timestamp,
+        geoLat: geo.latitude,
+        geoLong: geo.longitude,
+        geoAccu: geo.accuracy,
+        geoAlt: geo.altitude,
+        geoAltAccu: geo.altitudeAccuracy,
+        geoHeading: geo.heading,
+        geoSpeed: geo.speed,
         rideID: this.rideId,
         tagID: this.tagId? this.tagId: 999999
       };
@@ -116,15 +126,15 @@
       this.tagIconName = 'icons:label-outline';
     },
 
-    accelerometer: {
+    sensors: {
       _watchId: null,
       _config: {
         frequency: 300 // milliseconds
       },
       startWatching: function(onReading, onError) {
-        // if(!navigator || !navigator.accelerometer) return;
+        // if(!navigator || !navigator.sensors) return;
         //
-        // this._watchId = navigator.accelerometer.watchAcceleration(onReading, onError, this._config);
+        // this._watchId = navigator.sensors.watchAcceleration(onReading, onError, this._config);
         window.parent.postMessage('sensors-start', '*');
         window.addEventListener('message', function(ev) {
           var message = ev.data,
@@ -137,9 +147,9 @@
       },
 
       stopWatching: function() {
-        // if(!navigator || !navigator.accelerometer) return;
+        // if(!navigator || !navigator.sensors) return;
         //
-        // navigator.accelerometer.clearWatch(this._watchId);
+        // navigator.sensors.clearWatch(this._watchId);
         window.parent.postMessage('sensors-stop', '*');
       }
     }

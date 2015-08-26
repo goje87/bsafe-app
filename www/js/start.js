@@ -63,8 +63,8 @@ var app = {
     onMessage: function(ev) {
       var message = ev.data;
       ({
-        'sensors-start': accelerometer.start,
-        'sensors-stop': accelerometer.stop
+        'sensors-start': sensors.start,
+        'sensors-stop': sensors.stop
       })[message]();
     }
 };
@@ -119,36 +119,74 @@ var server = (function(G) {
   }
 })(this);
 
-var accelerometer = (function(G) {
-  var watchId = null,
-      config = {frequency: 300};
+var sensors = (function(G) {
+  var accelerometerWatch = null,
+      geolocationWatch = null,
+      geoPosition = null,
+      isRecording = false;
 
   function gotReading(acc) {
 
-    console.log(acc);
     // TODO: mainframe should not be referenced here
     var mainframe = document.querySelector('.mainframe'),
-        mainframeWin = mainframe.contentWindow || mainframe;
+        mainframeWin = mainframe.contentWindow || mainframe,
+        geo = geoPosition || {};
+
     mainframeWin.postMessage({
       type: 'sensors-reading',
-      data: acc
+      data: {
+        timestamp: acc.timestamp,
+        acceleration: { x: acc.x, y: acc.y, z: acc.z},
+        position: {
+          latitude: geo.latitude,
+          longitude: geo.longitude,
+          accuracy: geo.accuracy,
+          heading: geo.heading,
+          speed: geo.speed,
+          altitude: geo.altitude,
+          altitudeAccuracy: geo.altitudeAccuracy
+        }
+      }
     }, '*');
+  }
+
+  function gotPosition(pos) {
+    geoPosition = pos.coords;
   }
 
   function gotError(err) {
     console.error(err);
+    stop();
   }
 
-  return {
-    start: function() {
-      if(watchId) return;
-      watchId = G.navigator.accelerometer.watchAcceleration(gotReading, gotError, config);
-    },
+  function start() {
+    if(isRecording) return;
 
-    stop: function() {
-      if(!watchId) return;
-      G.navigator.accelerometer.clearWatch(watchId);
-      watchId = null;
-    }
+    accelerometerWatch = G.navigator.accelerometer.watchAcceleration(gotReading, gotError, {
+      frequency: 300
+    });
+    geolocationWatch = G.navigator.geolocation.watchPosition(gotPosition, gotError, {
+      enableHighAccuracy: true,
+      maximumAge: 3000
+    });
+
+    isRecording = true;
+  }
+
+  function stop() {
+    if(!isRecording) return;
+
+    navigator.accelerometer.clearWatch(accelerometerWatch);
+    navigator.geolocation.clearWatch(geolocationWatch);
+
+    geoPosition = null;
+    isRecording = false;
+  }
+
+
+
+  return {
+    start: start,
+    stop: stop
   }
 })(this);
