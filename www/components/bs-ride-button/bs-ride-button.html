@@ -15,7 +15,7 @@
     <iron-ajax
         id="endpoint"
         method="POST"
-        url="http://192.168.43.44:3000"
+        url="http://192.168.1.101:3000"
         handle-as="json"
         debounce-duration="100">
     </iron-ajax>
@@ -82,15 +82,16 @@
         accY: acc.y,
         accZ: acc.z,
         timestamp: reading.timestamp,
-        geoLat: geo.latitude,
-        geoLong: geo.longitude,
-        geoAccu: geo.accuracy,
-        geoAlt: geo.altitude,
-        geoAltAccu: geo.altitudeAccuracy,
+        geoLatitude: geo.latitude,
+        geoLongitude: geo.longitude,
+        geoAccuracy: geo.accuracy,
+        geoAltitude: geo.altitude,
+        geoAltitudeAccuracy: geo.altitudeAccuracy,
         geoHeading: geo.heading,
         geoSpeed: geo.speed,
-        rideID: this.rideId,
-        tagID: this.tagId? this.tagId: 999999
+        rideId: this.rideId,
+        tagId: this.tagId?this.tagId:null,
+        version: 1
       };
       endpoint.generateRequest();
     },
