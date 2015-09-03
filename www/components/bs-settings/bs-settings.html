@@ -1,0 +1,40 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/iron-localstorage/iron-localstorage.html" />
+
+<dom-module id="bs-settings">
+  <template>
+    <iron-localstorage
+        name="bs-settings"
+        value={{settings}}
+        on-iron-localstorage-load-empty="loadDefaultSettings">
+    </iron-localstorage>
+  </template>
+
+  <script>
+  (function() {
+    var _this;
+    Polymer({
+      is: 'bs-settings',
+      ready: function() {
+        _this = this;
+      },
+      properties: {
+        settings: {type: Object}
+      },
+
+      loadDefaultSettings: function() {
+        this.settings = {
+          apiBaseUrl: 'http://bsafe.goje87.com:3000'
+        }
+      },
+
+      set: function(key, value) {
+        _this.set('settings.'+key, value);
+      },
+      get: function(key) {
+        return _this.settings[key];
+      }
+    });
+  })();
+  </script>
+</don-module>
