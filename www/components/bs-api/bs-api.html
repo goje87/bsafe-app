@@ -1,0 +1,77 @@
+<link rel="import" href="/components/polymer/polymer.html"/>
+<link rel="import" href="/components/bs-settings/bs-settings.html" />
+<link rel="import" href="/components/iron-ajax/iron-ajax.html" />
+
+<dom-module>
+  <script>
+  'use strict';
+
+  Polymer({
+    is: 'bs-api',
+
+    responseCodes: {
+      SUCCESS: 'success',
+      FAILED: 'failed'
+    },
+
+    ready: function() {
+      this.ajax = document.createElement('iron-ajax');
+      this.settings = document.createElement('bs-settings');
+
+      this.ajax.addEventListener('error', this.onError.bind(this), false);
+      this.ajax.addEventListener('response', this.onResponse.bind(this), false);
+    },
+
+    onError: function(ev) {
+      this.fireError(ev.detail.error);
+    },
+
+    onResponse: function(ev) {
+      var response = ev.detail.response;
+
+      if(response.result !== this.responseCodes.SUCCESS) {
+        return this.fireError(response.message);
+      }
+
+      this.fireSuccess(response.data);
+    },
+
+    fireSuccess: function(response) {
+      this.fire('response', {response: response});
+    },
+
+    fireError: function(error) {
+      this.fire('error', {error: error});
+    },
+
+    send: function(method, endpoint, params) {
+      var settings = this.settings,
+          ajax = this.ajax;
+
+      ajax.method = method;
+      ajax.url = settings.get('apiBaseUrl') + endpoint;
+      ajax.handleAs = 'json';
+      ajax.debounceDuration = 100;
+      ajax.params = params;
+
+      return ajax.generateRequest();
+    },
+
+    get: function(endpoint, params) {
+      return this.send('GET', endpoint, params);
+    },
+
+    post: function(endpoint, params) {
+      return this.send('POST', endpoint, params);
+    },
+
+    put: function(endpoint, params) {
+      return this.send('PUT', endpoint, params);
+    },
+
+    delete: function(endpoint, params) {
+      return this.send('DELETE', endpoint, params);
+    }
+  });
+  </script>
+</dom-module>
