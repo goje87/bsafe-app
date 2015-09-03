@@ -49,15 +49,6 @@
         startedAt: +new Date()
       });
 
-      var gotRideInfo = function(ev) {
-        var rideInfo = ev.detail.response;
-        this.recordId = rideInfo._id;
-
-        api.removeEventListener('response', gotRideInfo);
-      }.bind(this);
-
-      api.addEventListener('response', gotRideInfo);
-
       // start watching sensors
       this.sensors.startWatching(this.onReading.bind(this), this.onError.bind(this));
 
@@ -69,7 +60,7 @@
 
       var api = this.$.api;
 
-      api.put('/rideInfo/'+this.recordId, {
+      api.put('/rideInfo/'+this.rideId, {
         status: 'completed',
         endedAt: +new Date()
       });
