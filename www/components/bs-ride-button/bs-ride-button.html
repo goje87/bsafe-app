@@ -84,13 +84,16 @@
     onReading: function(reading) {
       var api = this.$.api,
           acc = reading.acceleration || {},
-          geo = reading.position || {};
+          geo = reading.position || {},
+          timestamp = reading.timestamp;
+
+      if(timestamp === this.prevTimestamp) return;
 
       api.post('/sensorData', {
         accX: acc.x,
         accY: acc.y,
         accZ: acc.z,
-        timestamp: +new Date(),
+        timestamp: timestamp,
         geoLatitude: geo.latitude,
         geoLongitude: geo.longitude,
         geoAccuracy: geo.accuracy,
@@ -102,6 +105,8 @@
         tagId: this.tagId?this.tagId:null,
         version: 1
       });
+
+      this.prevTimestamp = timestamp;
     },
 
     onError: function(err) {
