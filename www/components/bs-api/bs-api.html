@@ -9,11 +9,6 @@
   Polymer({
     is: 'bs-api',
 
-    responseCodes: {
-      SUCCESS: 'success',
-      FAILED: 'failed'
-    },
-
     ready: function() {
       this.ajax = document.createElement('iron-ajax');
       this.settings = document.createElement('bs-settings');
@@ -27,10 +22,10 @@
     },
 
     onResponse: function(ev) {
-      var response = ev.detail.response;
+      var response = ev.detail.response || {};
 
-      if(response.result !== this.responseCodes.SUCCESS) {
-        return this.fireError(response.message);
+      if(response.success !== true) {
+        return this.fireError(response? response.error: 'Server Call Failed');
       }
 
       this.fireSuccess(response.data);
