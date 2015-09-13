@@ -39,5 +39,13 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "com.bsafe.sensors.motion": {
+        "source": {
+            "type": "local",
+            "path": "../BsafeMotionSensorsPlugin"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

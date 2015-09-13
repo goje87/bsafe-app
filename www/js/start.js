@@ -16,6 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+ function log(message) {
+     console.log(''+this, message);
+ }
+
 var app = {
     // Application Constructor
     initialize: function() {
@@ -38,6 +43,9 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
         server.start();
+
+        var sensors = cordova.plugins.BSMotionSensorsPlugin;
+        sensors.getList(log.bind('success'), log.bind('error'));
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -162,6 +170,12 @@ var sensors = (function(G) {
   function start() {
     if(isRecording) return;
 
+    cordova.plugins.BSMotionSensorsPlugin.start(function(reading) {
+        console.log(reading.accel);
+        console.log(reading.naccel);
+        console.log('----------------------------');
+    }, log.bind('error'));
+
     accelerometerWatch = G.navigator.accelerometer.watchAcceleration(gotReading, gotError, {
       frequency: 300
     });
@@ -175,6 +189,8 @@ var sensors = (function(G) {
 
   function stop() {
     if(!isRecording) return;
+
+    cordova.plugins.BSMotionSensorsPlugin.stop();
 
     navigator.accelerometer.clearWatch(accelerometerWatch);
     navigator.geolocation.clearWatch(geolocationWatch);
