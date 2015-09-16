@@ -15,14 +15,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-device-orientation": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-device-orientation"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "com.rjfun.cordova.httpd": {
         "source": {
             "type": "git",
@@ -32,10 +24,18 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-device-motion": {
+    "com.bsafe.sensors.motion": {
         "source": {
-            "type": "registry",
-            "id": "cordova-plugin-device-motion"
+            "type": "local",
+            "path": "../BSMotionSensorsPlugin"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.bsafe.sensors.motion": {
+        "source": {
+            "type": "local",
+            "path": "../BsafeMotionSensorsPlugin"
         },
         "is_top_level": true,
         "variables": {}

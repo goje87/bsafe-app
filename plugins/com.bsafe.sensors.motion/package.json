@@ -1,0 +1,14 @@
+{
+  "name": "BSMotionSensorsPlugin",
+  "version": "0.0.1",
+  "description": "Listeners for available motion sensors in device",
+  "cordova": {
+    "id": "com.bsafe.sensors.motion",
+    "platforms": []
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Goje",
+  "license": "ISC"
+}

@@ -16,6 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+ function log(message) {
+     console.log(''+this, message);
+ }
+
 var app = {
     // Application Constructor
     initialize: function() {
@@ -38,6 +43,9 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
         server.start();
+
+        var sensors = cordova.plugins.BSMotionSensorsPlugin;
+        sensors.getList(log.bind('success'), log.bind('error'));
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -120,22 +128,23 @@ var server = (function(G) {
 })(this);
 
 var sensors = (function(G) {
-  var accelerometerWatch = null,
-      geolocationWatch = null,
+  var geolocationWatch = null,
       geoPosition = null,
       isRecording = false;
 
-  function gotReading(acc) {
-
+  function gotReading(reading) {
     // TODO: mainframe should not be referenced here
     var mainframe = document.querySelector('.mainframe'),
         mainframeWin = mainframe.contentWindow || mainframe,
-        geo = geoPosition || {};
+        geo = geoPosition || {},
+        acc = reading.acceleration,
+        timestamp = reading.timestamp;
 
     mainframeWin.postMessage({
       type: 'sensors-reading',
       data: {
-        timestamp: acc.timestamp,
+        version: 1,
+        timestamp: timestamp,
         acceleration: { x: acc.x, y: acc.y, z: acc.z},
         position: {
           latitude: geo.latitude,
@@ -162,9 +171,7 @@ var sensors = (function(G) {
   function start() {
     if(isRecording) return;
 
-    accelerometerWatch = G.navigator.accelerometer.watchAcceleration(gotReading, gotError, {
-      frequency: 300
-    });
+    cordova.plugins.BSMotionSensorsPlugin.start(gotReading, gotError);
     geolocationWatch = G.navigator.geolocation.watchPosition(gotPosition, gotError, {
       enableHighAccuracy: true,
       maximumAge: 3000
@@ -176,7 +183,7 @@ var sensors = (function(G) {
   function stop() {
     if(!isRecording) return;
 
-    navigator.accelerometer.clearWatch(accelerometerWatch);
+    cordova.plugins.BSMotionSensorsPlugin.stop();
     navigator.geolocation.clearWatch(geolocationWatch);
 
     geoPosition = null;
