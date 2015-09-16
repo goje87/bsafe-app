@@ -128,22 +128,23 @@ var server = (function(G) {
 })(this);
 
 var sensors = (function(G) {
-  var accelerometerWatch = null,
-      geolocationWatch = null,
+  var geolocationWatch = null,
       geoPosition = null,
       isRecording = false;
 
-  function gotReading(acc) {
-
+  function gotReading(reading) {
     // TODO: mainframe should not be referenced here
     var mainframe = document.querySelector('.mainframe'),
         mainframeWin = mainframe.contentWindow || mainframe,
-        geo = geoPosition || {};
+        geo = geoPosition || {},
+        acc = reading.acceleration,
+        timestamp = reading.timestamp;
 
     mainframeWin.postMessage({
       type: 'sensors-reading',
       data: {
-        timestamp: acc.timestamp,
+        version: 1,
+        timestamp: timestamp,
         acceleration: { x: acc.x, y: acc.y, z: acc.z},
         position: {
           latitude: geo.latitude,
@@ -170,15 +171,7 @@ var sensors = (function(G) {
   function start() {
     if(isRecording) return;
 
-    cordova.plugins.BSMotionSensorsPlugin.start(function(reading) {
-        console.log(reading.accel);
-        console.log(reading.naccel);
-        console.log('----------------------------');
-    }, log.bind('error'));
-
-    accelerometerWatch = G.navigator.accelerometer.watchAcceleration(gotReading, gotError, {
-      frequency: 300
-    });
+    cordova.plugins.BSMotionSensorsPlugin.start(gotReading, gotError);
     geolocationWatch = G.navigator.geolocation.watchPosition(gotPosition, gotError, {
       enableHighAccuracy: true,
       maximumAge: 3000
@@ -191,8 +184,6 @@ var sensors = (function(G) {
     if(!isRecording) return;
 
     cordova.plugins.BSMotionSensorsPlugin.stop();
-
-    navigator.accelerometer.clearWatch(accelerometerWatch);
     navigator.geolocation.clearWatch(geolocationWatch);
 
     geoPosition = null;
