@@ -1,12 +1,99 @@
 <link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/iron-icons/iron-icons.html" />
+<link rel="import" href="/components/iron-icons/av-icons.html" />
+<link rel="import" href="/components/paper-button/paper-button.html" />
+<link rel="import" href="/components/bs-sensors/bs-sensors.html" />
+<link rel="import" href="/components/bs-chart/bs-chart.html" />
+<link rel="import" href="/components/bs-api/bs-api.html" />
+<link rel="import" href="/components/bs-ride-recorder/bs-ride-recorder.html" />
 
 <dom-module id="pg-home">
-  <template>
-    Welcome to homepage1
-  </template>
-  <script>
+    <link rel="import" href="/themes/dark-side.css" type="css">
+    <style>
+    :host {
+        text-align: center;
+    }
+    </style>
+    <template>
+        <bs-api id="api"></bs-api>
+        <bs-ride-recorder id="recorder" is-recording={{isRecording}}></bs-ride-recorder>
+        <section>
+            <bs-chart id="chart"></bs-chart>
+        </section>
+        <section>
+            <div>Ride id: <span>{{rideId}}</span></li></div>
+            <div>Speed: <span>{{speed}}</span>Km/hr</div>
+        </section>
+        <section>
+            <template is="dom-if" if="{{!isRecording}}">
+                <paper-button raised class="primary" on-click="startRide">Start Ride</paper-button>
+            </template>
+            <template is="dom-if" if="{{isRecording}}">
+                <paper-button raised class="primary" on-click="stopRide">Stop Ride</paper-button>
+            </template>
+        </section>
+    </template>
+    <script>
     Polymer({
-      is: 'pg-home'
+        is: 'pg-home',
+        _readingsXY: [],
+        _readingsZ: [],
+        speed: 0,
+
+        ready: function() {
+            this.sensors = this.$.sensors;
+            this.api = this.$.api;
+            this.chart = this.$.chart;
+            this.recorder = this.$.recorder;
+            this.chart.width = window.innerWidth;
+            this.chart.height = 200;
+        },
+
+        _onReading: function(e) {
+            var reading = e.detail,
+                acc = reading.acceleration || {},
+                geo = reading.position || {},
+                x = acc.x,
+                y = acc.y,
+                z = acc.z,
+                xy = Math.sqrt(x*x + y*y);
+
+            this.speed = geo.speed ? geo.speed*3.6 : 0;
+            this.speed = Math.round(this.speed * 100)/100;
+
+            this._readingsXY.push({
+                x: reading.timestamp,
+                y: xy
+            });
+
+            this._readingsZ.push({
+                x: reading.timestamp,
+                y: z
+            });
+
+            if(this._readingsXY.length > 100) {
+                this._readingsXY.shift();
+            }
+
+            if(this._readingsZ.length > 100) {
+                this._readingsZ.shift();
+            }
+
+            this.chart.draw([this._readingsXY, this._readingsZ]);
+        },
+
+        startRide: function() {
+            this.recorder.startRecording();
+            this._readingsXY = [];
+            this._readingsZ = [];
+            this.recorder.addEventListener('reading', this._onReading.bind(this), false);
+            this.rideId = this.recorder.rideId;
+        },
+
+        stopRide: function() {
+            this.recorder.stopRecording();
+            this.recorder.removeEventListener('reading', this._onReading, false);
+        }
     });
-  </script>
+    </script>
 </dom-module>
