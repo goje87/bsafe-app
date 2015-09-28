@@ -83,9 +83,7 @@ public class BSMotionSensorsPlugin extends CordovaPlugin implements SensorEventL
                 sensors.put(sensor.getStringType());
             }
 
-            PluginResult result = new PluginResult(PluginResult.Status.OK, sensors);
-            result.setKeepCallback(true);
-            callbackContext.sendPluginResult(result);
+            this.win(sensors);
             return true;
         }
         if (action.equals("start")) {
@@ -135,11 +133,11 @@ public class BSMotionSensorsPlugin extends CordovaPlugin implements SensorEventL
         }
 
         this.setStatus(BSMotionSensorsPlugin.STARTING);
-        boolean isAccelRegistered = this.sensorManager.registerListener(this, this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), this.sensorManager.SENSOR_DELAY_GAME);
+        boolean isAccelRegistered = this.sensorManager.registerListener(this, this.sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), this.sensorManager.SENSOR_DELAY_GAME);
         boolean isGravityRegistered = this.sensorManager.registerListener(this, this.sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),this.sensorManager.SENSOR_DELAY_GAME);
         boolean isMagneticRegistered = this.sensorManager.registerListener(this, this.sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),this.sensorManager.SENSOR_DELAY_GAME);
 
-        if(!isAccelRegistered || !isGravityRegistered) {
+        if(!isAccelRegistered || !isGravityRegistered || !isMagneticRegistered) {
             this.setStatus(BSMotionSensorsPlugin.ERROR_FAILED_TO_START);
             this.fail(BSMotionSensorsPlugin.ERROR_FAILED_TO_START, "Device sensors returned an error");
         }
@@ -183,7 +181,7 @@ public class BSMotionSensorsPlugin extends CordovaPlugin implements SensorEventL
             float[] aData = new float[3];
 
             switch(sensor.getType()) {
-                case Sensor.TYPE_ACCELEROMETER:
+                case Sensor.TYPE_LINEAR_ACCELERATION:
                     aData = event.values.clone();
 
                     if(gData == null || mData == null) return;
@@ -207,25 +205,23 @@ public class BSMotionSensorsPlugin extends CordovaPlugin implements SensorEventL
                     Matrix.multiplyMV(resultVec, 0, iR, 0, relAcc, 0);
 
                     JSONObject result = new JSONObject();
-                    JSONObject accel = new JSONObject();
-                    JSONObject naccel = new JSONObject();
-                    try {
-                        accel.put("x", aData[0]);
-                        accel.put("y", aData[1]);
-                        accel.put("z", aData[2]);
-                        naccel.put("x", resultVec[0]);
-                        naccel.put("y", resultVec[1]);
-                        naccel.put("z", resultVec[2]);
+                    Reading linearAcceleration = new Reading(aData);
+                    Reading acceleration = new Reading(resultVec);
+                    Reading gravity = new Reading(this.gData);
+                    Reading magneticField = new Reading(this.mData);
 
+                    try {
                         result.put("timestamp", System.currentTimeMillis());
-                        result.put("accel", accel);
-                        result.put("naccel", naccel);
+                        result.put("linearAcceleration", linearAcceleration.getJSON());
+                        result.put("acceleration", acceleration.getJSON());
+                        result.put("gravity", gravity.getJSON());
+                        result.put("magneticField", magneticField.getJSON());
                     }
                     catch(JSONException e) {
                         e.printStackTrace();
                     }
 
-                    callHandler(result);
+                    this.win(result);
 
                 break;
                 case Sensor.TYPE_GRAVITY:
@@ -259,32 +255,20 @@ public class BSMotionSensorsPlugin extends CordovaPlugin implements SensorEventL
             e.printStackTrace();
         }
         PluginResult err = new PluginResult(PluginResult.Status.ERROR, errorObj);
-        err.setKeepCallback(true);
-        callbackContext.sendPluginResult(err);
+        this.callbackWithPluginResult(err);
     }
 
-    private void callHandler(JSONObject r) {
+    private void win(JSONObject r) {
         PluginResult result = new PluginResult(PluginResult.Status.OK, r);
-        result.setKeepCallback(true);
-        callbackContext.sendPluginResult(result);
+        this.callbackWithPluginResult(result);
     }
 
-    private void win() {
-        JSONObject pluginReading = new JSONObject();
-        String accelReading = this.accelReading.getJSON().toString();
-        String gravityReading = this.gravityReading.getJSON().toString();
+    private void win(JSONArray r) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, r);
+        this.callbackWithPluginResult(result);
+    }
 
-        try {
-            pluginReading.put("timestamp", this.timestamp);
-            pluginReading.put("acceleration", this.accelReading.getJSON().toString());
-            System.out.println(gravityReading);
-            pluginReading.put("gravity", this.gravityReading.getJSON().toString());
-        }
-        catch(JSONException e) {
-            e.printStackTrace();
-        }
-        // Success return object
-        PluginResult result = new PluginResult(PluginResult.Status.OK, pluginReading);
+    private void callbackWithPluginResult(PluginResult result) {
         result.setKeepCallback(true);
         callbackContext.sendPluginResult(result);
     }
@@ -295,24 +279,26 @@ public class BSMotionSensorsPlugin extends CordovaPlugin implements SensorEventL
 }
 
 class Reading {
-    public static String TYPE_ACCELERATION = "acceleration";
-    public static String TYPE_GRAVITY = "gravity";
 
     public float x, y, z;
     String type;
 
-    public Reading(String type, float x, float y, float z) {
-        this.type = type;
+    public Reading(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public Reading(float[] values) {
+        this.x = values[0];
+        this.y = values[1];
+        this.z = values[2];
     }
 
     public JSONObject getJSON() {
         JSONObject r = new JSONObject();
 
         try {
-            r.put("type", this.type);
             r.put("x", this.x);
             r.put("y", this.y);
             r.put("z", this.z);
