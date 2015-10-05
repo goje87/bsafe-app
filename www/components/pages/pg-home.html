@@ -23,7 +23,7 @@
     }
     </style>
     <template>
-        <bs-dataset-rides model="{{model}}" on-model-changed="_modelChanged"></bs-dataset-rides>
+        <bs-dataset-rides model="{{model}}"></bs-dataset-rides>
         <iron-list items="{{model}}" as="ride">
             <template>
                 <paper-icon-item on-click="_rideClicked">
@@ -46,11 +46,6 @@
     <script>
     Polymer({
         is: 'pg-home',
-
-        _modelChanged: function() {
-            console.log(arguments);
-            console.log(this.model);
-        },
 
         _getFormattedTime: function(milliseconds) {
             return (new Date(milliseconds)).toDateString();

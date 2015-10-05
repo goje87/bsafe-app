@@ -43,7 +43,6 @@
             },
 
             ready: function() {
-                console.log('ready called...');
                 this._boundOnDatasetChange = this._onDatasetChange.bind(this);
             },
 
@@ -93,7 +92,6 @@
             },
 
             attached: function() {
-                console.log('attached... adding observer');
                 // start observing dataset
                 Array.observe(dataset, this._boundOnDatasetChange);
 
@@ -107,14 +105,12 @@
             },
 
             detached: function() {
-                console.log('detached... removing observer');
                 // stop observing dataset
                 Array.unobserve(dataset, this._boundOnDatasetChange);
             },
 
             _onDatasetChange: function() {
                 // fire model change event
-                console.log('dataset is changed');
                 this.fire('model-changed');
             },
 
