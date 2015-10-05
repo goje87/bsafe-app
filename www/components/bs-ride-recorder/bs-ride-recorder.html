@@ -1,0 +1,108 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/bs-sensors/bs-sensors.html" />
+<link rel="import" href="/components/bs-settings/bs-settings-user.html" />
+<link rel="import" href="/components/bs-api/bs-api.html" />
+
+<dom-module id="bs-ride-recorder">
+    <template>
+        <bs-settings-user user="{{user}}"></bs-settings-user>
+    </template>
+    <script>
+    (function() {
+
+        var globals = {
+            isRecording: false,
+            rideId: null
+        };
+
+        Polymer({
+            is: 'bs-ride-recorder',
+            get isRecording() {
+                return globals.isRecording;
+            },
+
+            set isRecording(value) {
+                globals.isRecording = value;
+                this.fire('is-recording-changed');
+            },
+
+            get rideId() {
+                return globals.rideId;
+            },
+
+            set rideId(id) {
+                globals.rideId = id;
+                this.fire('ride-id-changed');
+            },
+
+            ready: function() {
+                this.isRecording = false;
+                this.sensors = document.createElement('bs-sensors');
+                this.api = document.createElement('bs-api');
+
+                this._onReading = function(ev) {
+                    var reading = ev.detail,
+                        acc = reading.acceleration || {},
+                        geo = reading.position || {},
+                        timestamp = reading.timestamp;
+
+                    if(timestamp === this.prevTimestamp) return;
+
+                    api.post('/sensorData', {
+                        accX: acc.x,
+                        accY: acc.y,
+                        accZ: acc.z,
+                        timestamp: timestamp,
+                        geoLatitude: geo.latitude,
+                        geoLongitude: geo.longitude,
+                        geoAccuracy: geo.accuracy,
+                        geoAltitude: geo.altitude,
+                        geoAltitudeAccuracy: geo.altitudeAccuracy,
+                        geoHeading: geo.heading,
+                        geoSpeed: geo.speed,
+                        rideId: this.rideId,
+                        version: 1
+                    });
+
+                    this.prevTimestamp = timestamp;
+
+                    this.fire('reading', reading);
+
+                }.bind(this);
+            },
+
+            startRecording: function() {
+                if(this.isRecording) return;
+
+                this.sensors.start();
+                this.sensors.addEventListener('reading', this._onReading, false);
+                this.rideId = Math.round(Math.random()*1000000);
+
+                this.api.post('/rideInfo', {
+                    rideId: this.rideId,
+                    userId: this.user.mobile,
+                    status: 'inprogress',
+                    startedAt: +new Date()
+                });
+
+                this.isRecording = true;
+            },
+
+            stopRecording: function() {
+                if(!this.isRecording) return;
+
+                this.sensors.stop();
+                this.sensors.removeEventListener('reading', this._onReading, false);
+
+                api.put('/rideInfo/'+this.rideId, {
+                    status: 'completed',
+                    endedAt: +new Date()
+                });
+
+                this.rideId = null;
+                this.isRecording = false;
+            }
+        })
+    })()
+    </script>
+</dom-module>

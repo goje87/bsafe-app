@@ -2,76 +2,101 @@
 <link rel="import" href="/components/bs-settings/bs-settings.html" />
 <link rel="import" href="/components/iron-ajax/iron-ajax.html" />
 
-<dom-module>
-  <script>
-  'use strict';
+<dom-module id="bs-api">
+    <template>
+        <bs-settings settings="{{settings}}" on-settings-loaded="_settingsLoaded"></bs-settings>
+    </template>
+    <script>
+    'use strict';
 
-  Polymer({
-    is: 'bs-api',
+    Polymer({
+        is: 'bs-api',
 
-    responseCodes: {
-      SUCCESS: 'success',
-      FAILED: 'failed'
-    },
+        ready: function() {
+            this.ajax = document.createElement('iron-ajax');
 
-    ready: function() {
-      this.ajax = document.createElement('iron-ajax');
-      this.settings = document.createElement('bs-settings');
+            this.ajax.addEventListener('error', this.onError.bind(this), false);
+            this.ajax.addEventListener('response', this.onResponse.bind(this), false);
+        },
 
-      this.ajax.addEventListener('error', this.onError.bind(this), false);
-      this.ajax.addEventListener('response', this.onResponse.bind(this), false);
-    },
+        _settingsLoaded: function() {
+            this._executeQueue();
+        },
 
-    onError: function(ev) {
-      this.fireError(ev.detail.error);
-    },
+        onError: function(ev) {
+            this.fireError(ev.detail.error);
+        },
 
-    onResponse: function(ev) {
-      var response = ev.detail.response;
+        onResponse: function(ev) {
+            var response = ev.detail.response;
 
-      if(response.result !== this.responseCodes.SUCCESS) {
-        return this.fireError(response.message);
-      }
+            if(response.success !== true) {
+                return this.fireError(response.message);
+            }
 
-      this.fireSuccess(response.data);
-    },
+            this.fireSuccess(response.data);
+        },
 
-    fireSuccess: function(response) {
-      this.fire('response', {response: response});
-    },
+        fireSuccess: function(response) {
+            this.fire('response', {response: response});
+        },
 
-    fireError: function(error) {
-      this.fire('error', {error: error});
-    },
+        fireError: function(error) {
+            this.fire('error', {error: error});
+        },
 
-    send: function(method, endpoint, params) {
-      var settings = this.settings,
-          ajax = this.ajax;
+        send: function(method, endpoint, params) {
+            var settings = this.settings,
+            ajax = this.ajax;
 
-      ajax.method = method;
-      ajax.url = settings.get('apiBaseUrl') + endpoint;
-      ajax.handleAs = 'json';
-      ajax.debounceDuration = 100;
-      ajax.params = params;
+            this._queue(function() {
+                ajax.method = method;
+                //   ajax.url = settings.get('apiBaseUrl') + endpoint;
+                ajax.url = this.settings.apiBaseUrl + endpoint;
+                ajax.handleAs = 'json';
+                ajax.debounceDuration = 100;
+                ajax.params = params;
 
-      return ajax.generateRequest();
-    },
+                ajax.generateRequest();
+            });
+        },
 
-    get: function(endpoint, params) {
-      return this.send('GET', endpoint, params);
-    },
+        _waitlist: [],
 
-    post: function(endpoint, params) {
-      return this.send('POST', endpoint, params);
-    },
+        _queue: function(func) {
+            var boundFunc = func.bind(this);
 
-    put: function(endpoint, params) {
-      return this.send('PUT', endpoint, params);
-    },
+            if(this._isReady) {
+                boundFunc();
+            }
+            else {
+                this._waitlist.push(boundFunc);
+            }
+        },
 
-    delete: function(endpoint, params) {
-      return this.send('DELETE', endpoint, params);
-    }
-  });
-  </script>
+        _executeQueue: function() {
+            this._isReady = true;
+
+            this._waitlist.map(function(boundFunc) {
+                boundFunc();
+            });
+        },
+
+        get: function(endpoint, params) {
+            return this.send('GET', endpoint, params);
+        },
+
+        post: function(endpoint, params) {
+            return this.send('POST', endpoint, params);
+        },
+
+        put: function(endpoint, params) {
+            return this.send('PUT', endpoint, params);
+        },
+
+        delete: function(endpoint, params) {
+            return this.send('DELETE', endpoint, params);
+        }
+    });
+    </script>
 </dom-module>

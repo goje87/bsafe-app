@@ -26,16 +26,9 @@
     },
     "com.bsafe.sensors.motion": {
         "source": {
-            "type": "local",
-            "path": "../BSMotionSensorsPlugin"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
-    "com.bsafe.sensors.motion": {
-        "source": {
-            "type": "local",
-            "path": "../BsafeMotionSensorsPlugin"
+            "type": "git",
+            "url": "https://github.com/goje87/BSMotionSensorsPlugin",
+            "subdir": "."
         },
         "is_top_level": true,
         "variables": {}

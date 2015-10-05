@@ -1,0 +1,72 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/bs-router/bs-router-slot.html" />
+<link rel="import" href="/components/bs-router/bs-link.html" />
+
+<dom-module id="bs-router">
+    <script src="/components/page/page.js"></script>
+    <script>
+    (function() {
+        var routes = [];
+
+        Polymer({
+            is: 'bs-router',
+
+            route: function(config) {
+                var path = config.path,
+                    comp = config.comp,
+                    compPath = this.constructComponentPath(comp),
+                    _this = this;
+
+                routes.push(config);
+
+                page(path, function(ctx) {
+                    Polymer.Base.importHref(compPath, function(e) {
+                        _this._updateSlotWithComponent('main', comp, ctx.params);
+
+                    }, _this._componentLoadError);
+                });
+            },
+
+            constructComponentPath: function(compName) {
+                return '/components/'+compName+'/'+compName+'.html';
+            },
+
+            ready: function() {
+                this.routerSlot = document.createElement('bs-router-slot');
+            },
+
+            start: function() {
+                page({
+                    pushstate: false,
+                    hashbang: true
+                });
+            },
+
+            _updateSlotWithComponent: function(slotName, compName, params) {
+                var slot = this._getSlot(slotName),
+                    comp = document.createElement(compName);
+                    comp.params = params;
+
+                // empty the slot element
+                while(slot.firstChild) {
+                    slot.removeChild(slot.firstChild);
+                }
+
+                slot.appendChild(comp);
+            },
+
+            _getSlot: function(slotName) {
+                return this.routerSlot.get(slotName);
+            },
+
+            _componentLoadError: function(err) {
+                console.error('Router was unable to load component. ', err);
+            },
+
+            goto: function(path) {
+                page(path);
+            }
+        });
+    })()
+    </script>
+</dom-module>

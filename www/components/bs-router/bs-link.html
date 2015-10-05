@@ -1,0 +1,28 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/bs-router/bs-router.html" />
+
+<dom-module id="bs-link">
+    <template>
+        <content></content>
+    </template>
+    <script>
+    Polymer({
+        is: 'bs-link',
+
+        properties: {
+            goto: {
+                type: String
+            }
+        },
+
+        listeners: {
+            'tap': '_handleTap'
+        },
+
+        _handleTap: function() {
+            var path = this.goto;
+            document.createElement('bs-router').goto(path);
+        }
+    });
+    </script>
+</dom-module>

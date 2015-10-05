@@ -1,0 +1,61 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/pages/bs-page.html" />
+<link rel="import" href="/components/gold-phone-input/gold-phone-input.html" />
+<link rel="import" href="/components/paper-button/paper-button.html" />
+<link rel="import" href="/components/paper-card/paper-card.html" />
+<link rel="import" href="/components/bs-router/bs-router.html" />
+<link rel="import" href="/components/bs-settings/bs-settings-user.html" />
+
+<dom-module id="pg-login">
+    <link rel="import" href="/themes/dark-side.css" type="css" />
+    <link rel="import" href="/themes/extra.css" type="css" />
+    <template>
+        <bs-settings-user user="{{user}}"></bs-settings-user>
+        <bs-page>
+            <section class="is-padded">
+                <gold-phone-input
+                    id="phoneNum"
+                    country-code="91"
+                    auto-validate
+                    phone-number-pattern="XXXXXXXXXX"
+                    label="Mobile Number"
+                    required
+                    auto-focus
+                    invalid="{{phNumInvalid}}"
+                    value="{{user.mobile}}">
+                </gold-phone-input>
+            </section>
+            <section class="horizontal layout end-justified is-padded">
+                <paper-button hidden$="{{phNumInvalid}}" raised class="primary" on-click="_proceedClicked">
+                    Proceed
+                </paper-button>
+            </section>
+        </bs-page>
+    </template>
+    <script>
+    Polymer({
+        is: 'pg-login',
+
+        ready: function() {
+            if(this.user && this.user.isLoggedIn) {
+                this._successfullyLoggedIn();
+            }
+            this.$.phoneNum.validate();
+        },
+
+        _successfullyLoggedIn() {
+            document.createElement('bs-router').goto('/');
+        },
+
+        _proceedClicked: function() {
+            var phomeNum = this.$.phoneNum,
+                isValid = !phoneNum.invalid && phoneNum.value.length > 0;
+
+            if(isValid) {
+                this.set('user.isLoggedIn', true);
+                this._successfullyLoggedIn();
+            }
+        }
+    });
+    </script>
+</dom-module>
