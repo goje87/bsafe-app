@@ -24,8 +24,7 @@
     </style>
     <template>
         <bs-dataset-rides model="{{model}}"></bs-dataset-rides>
-
-        <iron-list items="[[model]]" as="ride">
+        <iron-list items="{{model}}" as="ride">
             <template>
                 <paper-icon-item on-click="_rideClicked">
                     <iron-icon icon="maps:directions-car" item-icon></iron-icon>
