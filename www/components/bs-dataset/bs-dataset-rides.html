@@ -94,13 +94,15 @@
 
             attached: function() {
                 console.log('attached... adding observer');
-                this._onDatasetChange();
                 // start observing dataset
                 Array.observe(dataset, this._boundOnDatasetChange);
 
                 if(count < 1) {
                     this.remoteGet();
                     count++;
+                }
+                else {
+                    this._onDatasetChange();
                 }
             },
 
