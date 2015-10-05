@@ -1,0 +1,36 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/iron-localstorage/iron-localstorage.html" />
+
+<dom-module id="bs-settings-user">
+    <template>
+        <iron-localstorage
+            name="bs-settings-user"
+            value="{{user}}"
+            on-iron-localstorage-load-empty="_loadDefaultSettings"
+            on-iron-localstorage-load="_localstorageLoaded">
+        </iron-localstorage>
+    </template>
+
+    <script>
+    Polymer({
+        is: 'bs-settings-user',
+        properties: {
+            user: {
+                type: Object,
+                notify: true
+            }
+        },
+
+        _loadDefaultSettings: function() {
+            this.user = {
+                isLoggedIn: false
+            };
+        },
+
+        _localstorageLoaded: function() {
+            this.fire('settings-loaded');
+        }
+
+    })
+    </script>
+</dom-module>

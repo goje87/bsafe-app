@@ -1,8 +1,12 @@
 <link rel="import" href="/components/polymer/polymer.html" />
 <link rel="import" href="/components/bs-sensors/bs-sensors.html" />
+<link rel="import" href="/components/bs-settings/bs-settings-user.html" />
 <link rel="import" href="/components/bs-api/bs-api.html" />
 
-<dom-module id="bs-sensors">
+<dom-module id="bs-ride-recorder">
+    <template>
+        <bs-settings-user user="{{user}}"></bs-settings-user>
+    </template>
     <script>
     (function() {
 
@@ -76,6 +80,7 @@
 
                 this.api.post('/rideInfo', {
                     rideId: this.rideId,
+                    userId: this.user.mobile,
                     status: 'inprogress',
                     startedAt: +new Date()
                 });

@@ -15,31 +15,66 @@
         <link rel="import" href="/components/paper-tabs/paper-tabs.html" />
         <link rel="import" href="/components/paper-icon-button/paper-icon-button.html" />
         <link rel="import" href="/components/paper-drawer-panel/paper-drawer-panel.html" />
-        <link rel="import" href="/components/paper-item/paper-icon-item.html" />
+        <link rel="import" href="/components/paper-menu/paper-menu.html" />
+        <link rel="import" href="/components/paper-item/paper-item.html" />
         <link rel="import" href="/components/paper-button/paper-button.html" />
         <link rel="import" href="/components/iron-flex-layout/classes/iron-flex-layout.html" />
-        <link rel="import" href="/components/pages/pg-home.html" />
+        <link rel="import" href="/components/iron-selector/iron-selector.html" />
+        <link rel="import" href="/components/iron-icons/iron-icons.html" />
+        <link rel="import" href="/components/neon-animation/neon-animated-pages.html" />
+        <link rel="import" href="/components/neon-animation/neon-animatable.html" />
+        <link rel="import" href="/components/neon-animation/neon-animations.html" />
+        <link rel="import" href="/components/more-routing/more-routing.html" />
+        <link rel="import" href="/components/bs-router/bs-router.html" />
 
         <link rel="import" href="/themes/dark-side.html" />
     </head>
     <body class="fullbleed layout vertical">
+        <more-routing-config driver="hash"></more-routing-config>
+        <more-route name="home" path="/"></more-route>
+        <more-route name="login" path="/login"></more-route>
+
         <paper-drawer-panel>
             <paper-header-panel drawer>
                 <paper-toolbar>
                     <div>Bsafe</div>
                 </paper-toolbar>
                 <div class="layout vertical drawer-items">
-                    <a class="drawer-item">
-                        <paper-icon-item>YO!</paper-icon-item>
-                    </a>
+                    <paper-menu>
+                        <bs-link goto="/" class="drawer-item">
+                            <paper-item>Home</paper-item>
+                        </bs-link>
+                        <bs-link goto="/Login" class="drawer-item">
+                            <paper-item>Login</paper-item>
+                        </bs-link>
+                        <bs-link goto="/rides" class="drawer-item">
+                            <paper-item>Rides</paper-items>
+                        </bs-link>
+                        <bs-link goto="/rides/new" class="drawer-item">
+                            <paper-item>New Ride</paper-item>
+                        </bs-link>
+                    </paper-menu>
                 </div>
             </paper-header-panel>
             <paper-header-panel main class="flex">
                 <paper-toolbar>
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <div>Rides</div>
+                    <div>Rides 1234</div>
                 </paper-toolbar>
-                <pg-home></pg-home>
+                <bs-router-slot name="main"></bs-router-slot>
+                <script>
+                var router = document.createElement('bs-router');
+
+                router.constructComponentPath = function(compName) {
+                    return '/components/pages/'+compName+'.html';
+                };
+
+                router.route({path: '/', comp: 'pg-home'});
+                router.route({path: '/login', comp: 'pg-login'});
+                router.route({path: '/ride/:rideId', comp: 'pg-ride'});
+                router.route({path: '/rides/new', comp: 'pg-ride-new'});
+                router.start();
+                </script>
             </paper-header-panel>
         </paper-drawer-panel>
     </body>

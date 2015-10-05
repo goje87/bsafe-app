@@ -1,0 +1,31 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+
+<dom-module id="bs-router-slot">
+    <script>
+    (function() {
+        var slots = [];
+
+        Polymer({
+            is: 'bs-router-slot',
+
+            properties: {
+                name: {
+                    type: String,
+                    value: 'main'
+                }
+            },
+
+            ready: function() {
+                slots.push(this);
+            },
+
+            get: function(name) {
+                for(var i = 0; i < slots.length; i++) {
+                    var slot = slots[i];
+                    if(slot.name === name) return slot;
+                }
+            }
+        });
+    })();
+    </script>
+</dom-module>

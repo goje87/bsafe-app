@@ -2,39 +2,47 @@
 <link rel="import" href="/components/iron-localstorage/iron-localstorage.html" />
 
 <dom-module id="bs-settings">
-  <template>
-    <iron-localstorage
+    <template>
+        <iron-localstorage
         name="bs-settings"
         value={{settings}}
-        on-iron-localstorage-load-empty="loadDefaultSettings">
+        on-iron-localstorage-load-empty="_loadDefaultSettings"
+        on-iron-localstorage-load="_localstorageLoaded">
     </iron-localstorage>
-  </template>
+</template>
 
-  <script>
-  (function() {
+<script>
+(function() {
     var _this;
     Polymer({
-      is: 'bs-settings',
-      ready: function() {
-        _this = this;
-      },
-      properties: {
-        settings: {type: Object}
-      },
+        is: 'bs-settings',
+        ready: function() {
+            _this = this;
+        },
+        properties: {
+            settings: {
+                type: Object,
+                notify: true
+            }
+        },
 
-      loadDefaultSettings: function() {
-        this.settings = {
-          apiBaseUrl: 'http://bsafe.goje87.com:3000'
+        _loadDefaultSettings: function() {
+            this.settings = {
+                apiBaseUrl: 'http://bsafe.goje87.com:3000'
+            }
+        },
+
+        _localstorageLoaded: function() {
+            this.fire('settings-loaded');
         }
-      },
 
-      set: function(key, value) {
-        _this.set('settings.'+key, value);
-      },
-      get: function(key) {
-        return _this.settings[key];
-      }
+        //   set: function(key, value) {
+        //     _this.set('settings.'+key, value);
+        //   },
+        //   get: function(key) {
+        //     return _this.settings[key];
+        //   }
     });
-  })();
-  </script>
+})();
+</script>
 </don-module>

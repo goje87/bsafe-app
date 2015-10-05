@@ -1,0 +1,151 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/bs-api/bs-api.html" />
+<link rel="import" href="/components/bs-settings/bs-settings-user.html" />
+
+<dom-module id="bs-dataset-rides">
+    <template>
+        <bs-settings-user user="{{user}}" on-settings-loaded="_settingsLoaded"></bs-settings-user>
+    </template>
+    <script>
+    (function() {
+        var dataset = [];
+        var count = 0;
+
+        Polymer({
+            is: 'bs-dataset-rides',
+
+            properties: {
+                query: {
+                    type: Object
+                }
+            },
+
+            queryChanged: function() {
+                this._onDatasetChange();
+            },
+
+            get model() {
+                if(this.query) {
+                    var query = this.query;
+
+                    var filteredDataset = dataset.filter(function(item) {
+                        for(var i in query) {
+                            if(query[i] !== item[i]) return false;
+                        }
+                        return true;
+                    });
+
+                    return filteredDataset;
+                }
+                else {
+                    return dataset;
+                }
+            },
+
+            ready: function() {
+                console.log('ready called...');
+                this._boundOnDatasetChange = this._onDatasetChange.bind(this);
+            },
+
+            _settingsLoaded: function() {
+                this._executeQueue();
+            },
+
+            remoteGet: function() {
+                var api = document.createElement('bs-api');
+
+                this._queue(function() {
+                    api.get('/rideInfo', {
+                        userId: this.user.mobile
+                    });
+                });
+
+                api.addEventListener('response', function(ev) {
+                    var response = ev.detail.response;
+                    dataset.length = 0;
+
+                    response.map(function(ride) {
+                        dataset.push(ride);
+                    });
+                });
+            },
+
+            // TODO: make this as a behaviour
+            _waitlist: [],
+
+            _queue: function(func) {
+                var boundFunc = func.bind(this);
+
+                if(this._isReady) {
+                    boundFunc();
+                }
+                else {
+                    this._waitlist.push(boundFunc);
+                }
+            },
+
+            _executeQueue: function() {
+                this._isReady = true;
+
+                this._waitlist.map(function(boundFunc) {
+                    boundFunc();
+                });
+            },
+
+            attached: function() {
+                console.log('attached... adding observer');
+                this._onDatasetChange();
+                // start observing dataset
+                Array.observe(dataset, this._boundOnDatasetChange);
+
+                if(count < 1) {
+                    this.remoteGet();
+                    count++;
+                }
+            },
+
+            detached: function() {
+                console.log('detached... removing observer');
+                // stop observing dataset
+                Array.unobserve(dataset, this._boundOnDatasetChange);
+            },
+
+            _onDatasetChange: function() {
+                // fire model change event
+                console.log('dataset is changed');
+                this.fire('model-changed');
+            },
+
+            add: function(obj) {
+                // add `obj` to data set
+                dataset.push(obj);
+
+                // call remote add
+            },
+
+            update: function (objId, fields) {
+                // update object having `objId` with fields in `obj`
+                var index = this._getIndexOfObject(objId),
+                    obj = dataset[index];
+
+                for(var i in fields) {
+                    obj[i] = fields[i];
+                }
+
+                dataset[index] = obj;
+
+                // call remote update
+            },
+
+            del: function(objId) {
+                // delete object having `objId`
+                var index = this._getIndexOfObject(objId);
+
+                dataset.splice(index, 1);
+
+                // call remote delete
+            }
+        });
+    })();
+    </script>
+</dom-module>
