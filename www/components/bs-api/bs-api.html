@@ -13,51 +13,68 @@
         is: 'bs-api',
 
         ready: function() {
+            // TODO: possible memory leak. listen when attached and un-listen when detached.
             this.ajax = document.createElement('iron-ajax');
 
-            this.ajax.addEventListener('error', this.onError.bind(this), false);
-            this.ajax.addEventListener('response', this.onResponse.bind(this), false);
+            this.ajax.addEventListener('error', this._onError.bind(this), false);
+            this.ajax.addEventListener('response', this._onResponse.bind(this), false);
         },
 
         _settingsLoaded: function() {
             this._executeQueue();
         },
 
-        onError: function(ev) {
-            this.fireError(ev.detail.error);
+        _onError: function(ev) {
+            this._fireError(ev.detail.error);
         },
 
-        onResponse: function(ev) {
+        _onResponse: function(ev) {
             var response = ev.detail.response;
 
             if(response.success !== true) {
-                return this.fireError(response.message);
+                return this._fireError(response.message);
             }
 
-            this.fireSuccess(response.data);
+            this._fireSuccess(response.data);
         },
 
-        fireSuccess: function(response) {
+        _fireSuccess: function(response) {
             this.fire('response', {response: response});
         },
 
-        fireError: function(error) {
+        _fireError: function(error) {
             this.fire('error', {error: error});
         },
 
         send: function(method, endpoint, params) {
             var settings = this.settings,
-            ajax = this.ajax;
+            ajax = this.ajax,
+            ajaxResolves, ajaxRejects;
 
             this._queue(function() {
                 ajax.method = method;
-                //   ajax.url = settings.get('apiBaseUrl') + endpoint;
                 ajax.url = this.settings.apiBaseUrl + endpoint;
                 ajax.handleAs = 'json';
                 ajax.debounceDuration = 100;
                 ajax.params = params;
 
-                ajax.generateRequest();
+                ajax.generateRequest().completes.then(function(request) {
+                    var response = request.response;
+
+                    if(response.success) {
+                        ajaxResolves(response.data);
+                    }
+                    else {
+                        ajaxRejects(response.error);
+                    }
+                }).catch(function(error) {
+                    ajaxRejects(error);
+                });
+            });
+
+            return new Promise(function(resolve, reject) {
+                ajaxResolves = resolve;
+                ajaxRejects = reject;
             });
         },
 

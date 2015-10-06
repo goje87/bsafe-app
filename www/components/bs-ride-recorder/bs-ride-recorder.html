@@ -1,11 +1,11 @@
 <link rel="import" href="/components/polymer/polymer.html" />
 <link rel="import" href="/components/bs-sensors/bs-sensors.html" />
-<link rel="import" href="/components/bs-settings/bs-settings-user.html" />
 <link rel="import" href="/components/bs-api/bs-api.html" />
+<link rel="import" href="/components/bs-dataset/bs-dataset-rides.html" />
 
 <dom-module id="bs-ride-recorder">
     <template>
-        <bs-settings-user user="{{user}}"></bs-settings-user>
+        <bs-dataset-rides id="rides" model="{{model}}"></bs-dataset-rides>
     </template>
     <script>
     (function() {
@@ -37,6 +37,7 @@
 
             ready: function() {
                 this.isRecording = false;
+                this.rides = this.$.rides;
                 this.sensors = document.createElement('bs-sensors');
                 this.api = document.createElement('bs-api');
 
@@ -78,9 +79,9 @@
                 this.sensors.addEventListener('reading', this._onReading, false);
                 this.rideId = Math.round(Math.random()*1000000);
 
-                this.api.post('/rideInfo', {
+
+                this.rides.add({
                     rideId: this.rideId,
-                    userId: this.user.mobile,
                     status: 'inprogress',
                     startedAt: +new Date()
                 });
@@ -94,7 +95,8 @@
                 this.sensors.stop();
                 this.sensors.removeEventListener('reading', this._onReading, false);
 
-                api.put('/rideInfo/'+this.rideId, {
+
+                this.rides.update(this.rideId, {
                     status: 'completed',
                     endedAt: +new Date()
                 });
