@@ -24,24 +24,26 @@
     </style>
     <template>
         <bs-dataset-rides model="{{model}}"></bs-dataset-rides>
-        <iron-list items="{{model}}" as="ride">
-            <template>
-                <paper-icon-item on-click="_rideClicked">
-                    <iron-icon icon="maps:directions-car" item-icon></iron-icon>
-                    <paper-item-body two-line class="flex">
-                        <div>{{ride.rideId}}</div>
-                        <div secondary>{{_getFormattedTime(ride.startedAt)}}</div>
-                    </paper-item-body>
-                    <iron-icon icon="icons:chevron-right"></iron-icon>
-                </paper-icon-item>
-            </template>
-        </iron-list>
+        <bs-page>
+            <iron-list items="{{model}}" as="ride">
+                <template>
+                    <paper-icon-item on-click="_rideClicked">
+                        <iron-icon icon="maps:directions-car" item-icon></iron-icon>
+                        <paper-item-body two-line class="flex">
+                            <div>{{ride.rideId}}</div>
+                            <div secondary>{{_getFormattedTime(ride.startedAt)}}</div>
+                        </paper-item-body>
+                        <iron-icon icon="icons:chevron-right"></iron-icon>
+                    </paper-icon-item>
+                </template>
+            </iron-list>
 
-        <div id="floatingControls">
-            <bs-link goto="/rides/new">
-                <paper-fab icon="icons:add"></paper-fab>
-            </bs-link>
-        </div>
+            <div id="floatingControls">
+                <bs-link goto="/rides/new">
+                    <paper-fab icon="icons:add"></paper-fab>
+                </bs-link>
+            </div>
+        </bs-page>
     </template>
     <script>
     Polymer({
@@ -53,7 +55,7 @@
 
         _rideClicked: function(ev) {
             var ride = ev.model.ride;
-            document.createElement('bs-router').goto('/ride/' + ride.rideId);
+            document.createElement('bs-router').goto('/rides/' + ride.rideId);
         }
     });
     </script>

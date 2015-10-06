@@ -5,6 +5,7 @@
 <dom-module id="bs-dataset-rides">
     <template>
         <bs-settings-user user="{{user}}" on-settings-loaded="_settingsLoaded"></bs-settings-user>
+        <bs-api id="api"></bs-api>
     </template>
     <script>
     (function() {
@@ -44,29 +45,11 @@
 
             ready: function() {
                 this._boundOnDatasetChange = this._onDatasetChange.bind(this);
+                this.api = this.$.api;
             },
 
             _settingsLoaded: function() {
                 this._executeQueue();
-            },
-
-            remoteGet: function() {
-                var api = document.createElement('bs-api');
-
-                this._queue(function() {
-                    api.get('/rideInfo', {
-                        userId: this.user.mobile
-                    });
-                });
-
-                api.addEventListener('response', function(ev) {
-                    var response = ev.detail.response;
-                    dataset.length = 0;
-
-                    response.map(function(ride) {
-                        dataset.push(ride);
-                    });
-                });
             },
 
             // TODO: make this as a behaviour
@@ -91,12 +74,13 @@
                 });
             },
 
+            // behaviour
             attached: function() {
                 // start observing dataset
                 Array.observe(dataset, this._boundOnDatasetChange);
 
                 if(count < 1) {
-                    this.remoteGet();
+                    this._remoteGet();
                     count++;
                 }
                 else {
@@ -104,23 +88,29 @@
                 }
             },
 
+            // behaviour
             detached: function() {
                 // stop observing dataset
                 Array.unobserve(dataset, this._boundOnDatasetChange);
             },
 
+            // behaviour
             _onDatasetChange: function() {
                 // fire model change event
                 this.fire('model-changed');
             },
 
+
+            // behaviour
             add: function(obj) {
                 // add `obj` to data set
                 dataset.push(obj);
 
                 // call remote add
+                if(this._remoteAdd) this._remoteAdd(obj);
             },
 
+            // behaviour
             update: function (objId, fields) {
                 // update object having `objId` with fields in `obj`
                 var index = this._getIndexOfObject(objId),
@@ -133,8 +123,10 @@
                 dataset[index] = obj;
 
                 // call remote update
+                if(this._remoteUpdate) this._remoteUpdate(objId, fields);
             },
 
+            // behaviour
             del: function(objId) {
                 // delete object having `objId`
                 var index = this._getIndexOfObject(objId);
@@ -142,7 +134,50 @@
                 dataset.splice(index, 1);
 
                 // call remote delete
-            }
+                if(this._remoteDelete) this._remoteDelete(objId);
+            },
+
+            // behaviour
+            // TODO: create indexedArray for faster search
+            _getIndexOfObject: function(objId) {
+                for(var i = 0; i < dataset.length; i++) {
+                    var obj = dataset[i];
+                    if(obj.rideId === objId) return i;
+                }
+            },
+
+            _remoteGet: function() {
+                this._queue(function() {
+                    this.api.get('/rideInfo', {
+                        userId: this.user.mobile
+                    })
+                    .then(function(response) {
+                        this._setDataset(response);
+                    }.bind(this));
+                });
+            },
+
+            // behaviour
+            _setDataset: function(newDataset) {
+                dataset.length = 0;
+
+                newDataset.map(function(entry) {
+                    dataset.push(entry);
+                });
+            },
+
+            _remoteAdd: function(obj) {
+                this._queue(function() {
+                    obj.userId = this.user.mobile;
+                    this.api.post('/rideInfo', obj);
+                });
+            },
+            _remoteUpdate: function(rideId, fields) {
+                this._queue(function() {
+                    this.api.put('/rideInfo/'+rideId, fields);
+                });
+            },
+            _remoteDelete: function(objId) {}
         });
     })();
     </script>

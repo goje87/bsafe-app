@@ -43,12 +43,6 @@
                         <bs-link goto="/Login" class="drawer-item">
                             <paper-item>Login</paper-item>
                         </bs-link>
-                        <bs-link goto="/rides" class="drawer-item">
-                            <paper-item>Rides</paper-items>
-                        </bs-link>
-                        <bs-link goto="/rides/new" class="drawer-item">
-                            <paper-item>New Ride</paper-item>
-                        </bs-link>
                     </paper-menu>
                 </div>
             </paper-header-panel>
@@ -67,8 +61,8 @@
 
                 router.route({path: '/', comp: 'pg-home'});
                 router.route({path: '/login', comp: 'pg-login'});
-                router.route({path: '/ride/:rideId', comp: 'pg-ride'});
                 router.route({path: '/rides/new', comp: 'pg-ride-new'});
+                router.route({path: '/rides/:rideId', comp: 'pg-ride'});
                 router.start();
                 </script>
             </paper-header-panel>
