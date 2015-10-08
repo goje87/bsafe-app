@@ -14,18 +14,22 @@
 <dom-module id="pg-home">
     <link rel="import" href="/themes/dark-side.css" type="css">
     <style>
-    #floatingControls {
+    .floating-controls {
         position: fixed;
         -webkit-transform: translate3d(0,0,0);
         transform: translate3d(0,0,0);
         right: 20px;
         bottom: 20px;
     }
+
+    .rides {
+        padding-bottom: 100px;
+    }
     </style>
     <template>
         <bs-dataset-rides model="{{model}}"></bs-dataset-rides>
         <bs-page>
-            <iron-list items="{{model}}" as="ride">
+            <iron-list items="{{model}}" as="ride" class="rides">
                 <template>
                     <paper-icon-item on-click="_rideClicked">
                         <iron-icon icon="maps:directions-car" item-icon></iron-icon>
@@ -38,7 +42,7 @@
                 </template>
             </iron-list>
 
-            <div id="floatingControls">
+            <div class="floating-controls">
                 <bs-link goto="/rides/new">
                     <paper-fab icon="icons:add"></paper-fab>
                 </bs-link>

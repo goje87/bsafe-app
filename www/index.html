@@ -7,8 +7,6 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1" />
         <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://fonts.gstatic.com http://fonts.gstatic.com http://goje87.com 'unsafe-inline'; style-src 'self' https://www.google.com http://*.googleapis.com https://*.googleapis.com 'unsafe-inline'; media-src *; frame-src http://localhost:8080; script-src https://www.google.com 'self' 'unsafe-inline'; connect-src *">
 
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
-
         <script src="components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
         <link rel="import" href="/components/paper-toolbar/paper-toolbar.html" />
@@ -27,6 +25,7 @@
         <link rel="import" href="/components/bs-router/bs-router.html" />
 
         <link rel="import" href="/themes/dark-side.html" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
     </head>
     <body class="fullbleed layout vertical">
 
@@ -46,12 +45,13 @@
                     </paper-menu>
                 </div>
             </paper-header-panel>
-            <paper-header-panel main class="flex">
+            <paper-header-panel main class="layout vertical">
                 <paper-toolbar>
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <div>Rides 1234</div>
+                    <div class="flex">Rides 1234</div>
+                    <paper-icon-button icon="refresh" id="headerRefreshButton"></paper-icon-button>
                 </paper-toolbar>
-                <bs-router-slot name="main"></bs-router-slot>
+                <bs-router-slot name="main" class="flex main-slot"></bs-router-slot>
                 <script>
                 var router = document.createElement('bs-router');
 
@@ -64,6 +64,17 @@
                 router.route({path: '/rides/new', comp: 'pg-ride-new'});
                 router.route({path: '/rides/:rideId', comp: 'pg-ride'});
                 router.start();
+
+                var refreshButton = document.querySelector('#headerRefreshButton');
+                refreshButton.addEventListener('click', function() {
+                    window.location.reload();
+                });
+
+                var drawerPanel = document.querySelector('paper-drawer-panel'),
+                    drawerPanelHeader = document.querySelector('paper-header-panel[drawer]');
+                drawerPanelHeader.addEventListener('click', function() {
+                    drawerPanel.closeDrawer();
+                });
                 </script>
             </paper-header-panel>
         </paper-drawer-panel>

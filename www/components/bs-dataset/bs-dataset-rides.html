@@ -104,7 +104,7 @@
             // behaviour
             add: function(obj) {
                 // add `obj` to data set
-                dataset.push(obj);
+                dataset.unshift(obj);
 
                 // call remote add
                 if(this._remoteAdd) this._remoteAdd(obj);
@@ -152,7 +152,7 @@
                         userId: this.user.mobile
                     })
                     .then(function(response) {
-                        this._setDataset(response);
+                        this._setDataset(response.reverse());
                     }.bind(this));
                 });
             },
