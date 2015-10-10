@@ -36,10 +36,11 @@
             },
 
             ready: function() {
+                var api = document.createElement('bs-api');
+                
                 this.isRecording = false;
                 this.rides = this.$.rides;
                 this.sensors = document.createElement('bs-sensors');
-                this.api = document.createElement('bs-api');
 
                 this._onReading = function(ev) {
                     var reading = ev.detail,
