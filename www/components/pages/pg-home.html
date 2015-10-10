@@ -12,7 +12,7 @@
 
 
 <dom-module id="pg-home">
-    <link rel="import" href="/themes/dark-side.css" type="css">
+    <link rel="import" href="/themes/theme.css" type="css">
     <style>
     .floating-controls {
         position: fixed;
@@ -34,7 +34,12 @@
                     <paper-icon-item on-click="_rideClicked">
                         <iron-icon icon="maps:directions-car" item-icon></iron-icon>
                         <paper-item-body two-line class="flex">
-                            <div>{{ride.rideId}}</div>
+                            <template is="dom-if" if="{{ride.title}}">
+                                <div>{{ride.title}}</div>
+                            </template>
+                            <template is="dom-if" if="{{!ride.title}}">
+                                <div>{{ride.rideId}}</div>
+                            </template>
                             <div secondary>{{_getFormattedTime(ride.startedAt)}}</div>
                         </paper-item-body>
                         <iron-icon icon="icons:chevron-right"></iron-icon>

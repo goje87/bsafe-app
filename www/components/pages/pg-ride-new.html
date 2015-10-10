@@ -10,7 +10,7 @@
 <link rel="import" href="/components/bs-router/bs-router.html" />
 
 <dom-module id="pg-ride-new">
-    <link rel="import" href="/themes/dark-side.css" type="css">
+    <link rel="import" href="/themes/theme.css" type="css">
     <style>
     :host {
         text-align: center;
@@ -52,6 +52,8 @@
             this.recorder = this.$.recorder;
             this.chart.width = window.innerWidth;
             this.chart.height = 200;
+            this._readingsZ.length = 100;
+            this._readingsXY.length = 100;
         },
 
         _onReading: function(e) {

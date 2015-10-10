@@ -3,38 +3,55 @@
 <link rel="import" href="/components/bs-dataset/bs-dataset-rides.html" />
 <link rel="import" href="/components/iron-icon/iron-icon.html" />
 <link rel="import" href="/components/iron-icons/iron-icons.html" />
+<link rel="import" href="/components/iron-icons/editor-icons.html" />
 <link rel="import" href="/components/iron-icons/hardware-icons.html" />
 <link rel="import" href="/components/paper-item/paper-icon-item.html" />
 <link rel="import" href="/components/paper-item/paper-item-body.html" />
 
 <dom-module id="pg-ride">
-    <link rel="import" href="/themes/dark-side.css" type="css" />
+    <link rel="import" href="/themes/theme.css" type="css" />
     <link rel="import" href="/themes/extra.css" type="css" />
+    <style>
+    .ride-edit {
+        opacity: 0.5;
+    }
+    </style>
     <template>
-        <bs-dataset-rides query={{query}} model={{model}}></bs-dataset-rides>
+        <bs-dataset-rides id="rides" query={{query}} model={{rides}}></bs-dataset-rides>
         <bs-page>
-            <template is="dom-repeat" items={{model}}>
-                <section class="is-padded">
-                    <h2>{{item.rideId}}</h2>
-                </section>
-                <paper-icon-item>
-                    <iron-icon icon="icons:event" item-icon></iron-icon>
-                    <paper-item-body>{{_getFormattedDate(item.startedAt)}}</paper-item-body>
-                </paper-icon-item>
-                <paper-icon-item>
-                    <iron-icon icon="hardware:watch" item-icon></iron-icon>
-                    <paper-item-body>
-                        <div>
-                            <span>{{_getFormattedTime(item.startedAt)}}</span> to
-                            <span>{{_getFormattedTime(item.endedAt)}}</span>
-                        </div>
-                    </paper-item-body>
-                </paper-icon-item>
-                <paper-icon-item>
-                    <iron-icon icon="icons:hourglass-empty" item-icon></iron-icon>
-                    <paper-item-body>Ride analysis pending...</paper-item-body>
-                </paper-icon-item>
-            </template>
+            <section class="is-padded">
+                <h3>
+                    <template is="dom-if" if="{{rides.0.title}}">
+                        <span>{{rides.0.title}}</span>
+                    </template>
+                    <template is="dom-if" if="{{!rides.0.title}}">
+                        <span>{{rides.0.rideId}}</span>
+                    </template>
+                    <paper-icon-button icon="editor:mode-edit" class="ride-edit" on-click="_editIconClicked">
+                    </paper-icon-button>
+                </h3>
+            </section>
+            <paper-icon-item>
+                <iron-icon icon="icons:info" item-icon></iron-icon>
+                <paper-item-body>{{rides.0.rideId}}</paper-item-body>
+            </paper-icon-item>
+            <paper-icon-item>
+                <iron-icon icon="icons:event" item-icon></iron-icon>
+                <paper-item-body>{{_getFormattedDate(rides.0.startedAt)}}</paper-item-body>
+            </paper-icon-item>
+            <paper-icon-item>
+                <iron-icon icon="hardware:watch" item-icon></iron-icon>
+                <paper-item-body>
+                    <div>
+                        <span>{{_getFormattedTime(rides.0.startedAt)}}</span> to
+                        <span>{{_getFormattedTime(rides.0.endedAt)}}</span>
+                    </div>
+                </paper-item-body>
+            </paper-icon-item>
+            <paper-icon-item>
+                <iron-icon icon="icons:hourglass-empty" item-icon></iron-icon>
+                <paper-item-body>Ride analysis pending...</paper-item-body>
+            </paper-icon-item>
         </bs-page>
     </template>
     <script>
@@ -58,6 +75,19 @@
             if(mins < 10) mins = '0'+mins;
 
             return hrs + ':' + mins;
+        },
+
+        _editIconClicked: function(ev) {
+            var ride = this.rides[0],
+                newTitle = window.prompt('Enter new title', ride.title);
+
+            console.log('old title: ', ride.title, ', new title: ', newTitle);
+
+            if(ride.title === newTitle) return;
+
+            this.$.rides.update(ride.rideId, {
+                title: newTitle
+            });
         }
     });
     </script>
