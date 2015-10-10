@@ -56,7 +56,14 @@
                 ajax.url = this.settings.apiBaseUrl + endpoint;
                 ajax.handleAs = 'json';
                 ajax.debounceDuration = 100;
-                ajax.params = params;
+                
+                if(method === 'GET') {
+                    ajax.params = params;
+                }
+                else {
+                    ajax.contentType = 'application/json';
+                    ajax.body = params;
+                }
 
                 ajax.generateRequest().completes.then(function(request) {
                     var response = request.response;

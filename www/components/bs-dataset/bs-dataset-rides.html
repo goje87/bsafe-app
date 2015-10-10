@@ -120,7 +120,7 @@
                     obj[i] = fields[i];
                 }
 
-                dataset[index] = obj;
+                dataset.splice(index, 1, obj);
 
                 // call remote update
                 if(this._remoteUpdate) this._remoteUpdate(objId, fields);

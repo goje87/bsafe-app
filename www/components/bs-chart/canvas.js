@@ -2072,8 +2072,8 @@
 		}
 
 		if (typeof (defaultOptions.Chart.creditHref) === "undefined") {
-			this.creditHref = "http://canvasjs.com/";
-			this.creditText = "CanvasJS.com";
+			this.creditHref = "";
+			this.creditText = "";
 		} else {
 			var creditTextChanged = this.updateOption("creditText");
 			var creditHrefChanged = this.updateOption("creditHref");
