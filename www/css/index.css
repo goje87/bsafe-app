@@ -9,4 +9,5 @@
 
 .main-slot {
     position: relative;
+    overflow: auto;
 }

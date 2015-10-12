@@ -1,0 +1,52 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/paper-toast/paper-toast.html" />
+<link rel="import" href="/components/iron-icons/iron-icons.html" />
+
+<dom-module id="bs-notifier">
+    <template>
+        <paper-toast id="toast" class="toast {{type}}">
+            <iron-icon class="toast-icon" icon="{{icon}}"></iron-icon>
+            <span>{{message}}</span>
+        </paper-toast>
+    </template>
+    <script>
+    Polymer({
+        is: 'bs-notifier',
+
+        ready: function() {
+            this.toast = this.$.toast;
+        },
+
+        notify: function(type, message) {
+            var icons = {
+                error: 'icons:cancel',
+                warning: 'icons:warning',
+                info: 'icons:info',
+                debug: 'icons:label',
+            };
+
+            this.type = type;
+            this.message = message;
+            this.icon = icons[type];
+
+            this.toast.show();
+        },
+
+        error: function(message) {
+            return this.notify('error', message);
+        },
+
+        warning: function(message) {
+            return this.notify('warning', message);
+        },
+
+        info: function(message) {
+            return this.notify('info', message);
+        },
+
+        debug: function(message) {
+            return this.notify('debug', message);
+        }
+    });
+    </script>
+</dom-module>
