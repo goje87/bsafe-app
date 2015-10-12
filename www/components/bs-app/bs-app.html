@@ -1,0 +1,77 @@
+<link rel="import" href="/components/polymer/polymer.html" />
+<link rel="import" href="/components/paper-toolbar/paper-toolbar.html" />
+<link rel="import" href="/components/paper-tabs/paper-tabs.html" />
+<link rel="import" href="/components/paper-icon-button/paper-icon-button.html" />
+<link rel="import" href="/components/paper-drawer-panel/paper-drawer-panel.html" />
+<link rel="import" href="/components/paper-menu/paper-menu.html" />
+<link rel="import" href="/components/paper-item/paper-item.html" />
+<link rel="import" href="/components/paper-button/paper-button.html" />
+<link rel="import" href="/components/paper-toast/paper-toast.html" />
+<link rel="import" href="/components/iron-flex-layout/classes/iron-flex-layout.html" />
+<link rel="import" href="/components/iron-selector/iron-selector.html" />
+<link rel="import" href="/components/iron-icons/iron-icons.html" />
+<link rel="import" href="/components/neon-animation/neon-animated-pages.html" />
+<link rel="import" href="/components/neon-animation/neon-animatable.html" />
+<link rel="import" href="/components/neon-animation/neon-animations.html" />
+<link rel="import" href="/components/bs-router/bs-router.html" />
+
+<dom-module id="bs-app">
+    <template>
+        <paper-drawer-panel id="drawerPanel">
+            <paper-header-panel drawer on-click="_drawerHeaderPanelClicked">
+                <paper-toolbar>
+                    <div>Bsafe</div>
+                </paper-toolbar>
+                <div class="layout vertical drawer-items">
+                    <paper-menu>
+                        <bs-link goto="/" class="drawer-item">
+                            <paper-item>Home</paper-item>
+                        </bs-link>
+                        <bs-link goto="/Login" class="drawer-item">
+                            <paper-item>Login</paper-item>
+                        </bs-link>
+                    </paper-menu>
+                </div>
+            </paper-header-panel>
+            <paper-header-panel main class="layout vertical">
+                <paper-toolbar>
+                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+                    <div class="flex">Rides 1234</div>
+                    <paper-icon-button icon="refresh" on-click="_refreshClicked"></paper-icon-button>
+                </paper-toolbar>
+                <bs-router-slot name="main" class="flex main-slot"></bs-router-slot>
+            </paper-header-panel>
+        </paper-drawer-panel>
+        <paper-toast duration="15000" id="toast">
+            blah!!!
+        </paper-toast>
+    </template>
+    <script>
+    Polymer({
+        is: 'bs-app',
+
+        ready: function() {
+            var router = document.createElement('bs-router');
+
+            router.constructComponentPath = function(compName) {
+                return '/components/pages/'+compName+'.html';
+            };
+
+            router.route({path: '/', comp: 'pg-home'});
+            router.route({path: '/login', comp: 'pg-login'});
+            router.route({path: '/rides/new', comp: 'pg-ride-new'});
+            router.route({path: '/rides/:rideId', comp: 'pg-ride'});
+            router.start();
+        },
+
+        _drawerHeaderPanelClicked: function() {
+            this.$.drawerPanel.closeDrawer();
+            this.$.toast.show();
+        },
+
+        _refreshClicked: function() {
+            window.location.reload();
+        }
+    });
+    </script>
+</dom-module>

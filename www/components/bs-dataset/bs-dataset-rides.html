@@ -1,11 +1,13 @@
 <link rel="import" href="/components/polymer/polymer.html" />
 <link rel="import" href="/components/bs-api/bs-api.html" />
 <link rel="import" href="/components/bs-settings/bs-settings-user.html" />
+<link rel="import" href="/components/bs-notifier/bs-notifier.html" />
 
 <dom-module id="bs-dataset-rides">
     <template>
         <bs-settings-user user="{{user}}" on-settings-loaded="_settingsLoaded"></bs-settings-user>
         <bs-api id="api"></bs-api>
+        <bs-notifier id="notifier"></bs-notifier>
     </template>
     <script>
     (function() {
@@ -46,6 +48,7 @@
             ready: function() {
                 this._boundOnDatasetChange = this._onDatasetChange.bind(this);
                 this.api = this.$.api;
+                this.notifier = this.$.notifier;
             },
 
             _settingsLoaded: function() {
@@ -153,6 +156,9 @@
                     })
                     .then(function(response) {
                         this._setDataset(response.reverse());
+                    }.bind(this))
+                    .catch(function(error) {
+                        this.notifier.error('Error while communicating to server');
                     }.bind(this));
                 });
             },

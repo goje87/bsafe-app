@@ -24,6 +24,11 @@
 
     .rides {
         padding-bottom: 100px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
     </style>
     <template>
@@ -46,13 +51,12 @@
                     </paper-icon-item>
                 </template>
             </iron-list>
-
-            <div class="floating-controls">
-                <bs-link goto="/rides/new">
-                    <paper-fab icon="icons:add"></paper-fab>
-                </bs-link>
-            </div>
         </bs-page>
+        <div class="floating-controls">
+            <bs-link goto="/rides/new">
+                <paper-fab icon="icons:add"></paper-fab>
+            </bs-link>
+        </div>
     </template>
     <script>
     Polymer({

@@ -8,27 +8,47 @@
 <link rel="import" href="/components/bs-api/bs-api.html" />
 <link rel="import" href="/components/bs-ride-recorder/bs-ride-recorder.html" />
 <link rel="import" href="/components/bs-router/bs-router.html" />
+<link rel="import" href="/components/paper-item/paper-icon-item.html" />
+<link rel="import" href="/components/paper-item/paper-item-body.html" />
+
 
 <dom-module id="pg-ride-new">
     <link rel="import" href="/themes/theme.css" type="css">
     <style>
-    :host {
-        text-align: center;
+
+    .fullwidth {
+        width: 100%;
     }
 
     </style>
     <template>
         <bs-api id="api"></bs-api>
         <bs-ride-recorder id="recorder" is-recording={{isRecording}}></bs-ride-recorder>
-        <bs-page>
+        <bs-page class="layout vertical">
             <section>
                 <bs-chart id="chart"></bs-chart>
             </section>
-            <section>
-                <div>Ride id: <span>{{rideId}}</span></div>
-                <div>Speed: <span>{{speed}}</span>Km/hr</div>
-            </section>
-            <section class="test-section">
+            <div>
+                <paper-icon-item>
+                    <iron-icon icon="icons:info" item-icon></iron-icon>
+                    <paper-item-body>{{rideId}}</paper-item-body>
+                </paper-icon-item>
+                <paper-icon-item>
+                    <iron-icon icon="av:av-timer" item-icon></iron-icon>
+                    <paper-item-body>{{speed}}</paper-item-body>
+                </paper-icon-item>
+                <paper-icon-item>
+                    <iron-icon icon="icons:swap-vert" item-icon></iron-icon>
+                    <paper-item-body class="layout horizontal start-justified">
+                        <span>{{maxZ.force}}</span> / <span>{{maxZ.speed}}</span>
+                    </paper-item-body>
+                </paper-icon-item>
+                <paper-icon-item>
+                    <iron-icon icon="icons:gesture" item-icon></iron-icon>
+                    <paper-item-body>{{maxZ.ratio}}</paper-item-body>
+                </paper-icon-item>
+            </div>
+            <section class="layout horizontal center-justified">
                 <template is="dom-if" if="{{!isRecording}}">
                     <paper-button raised class="primary" on-click="startRide">Start Ride</paper-button>
                 </template>
@@ -43,6 +63,8 @@
         is: 'pg-ride-new',
         _readingsXY: [],
         _readingsZ: [],
+        _readingsRatio: [],
+        _readings: [],
         speed: 0,
 
         ready: function() {
@@ -54,6 +76,8 @@
             this.chart.height = 200;
             this._readingsZ.length = 100;
             this._readingsXY.length = 100;
+            this._readingsRatio.length = 100;
+            // this._readings.length = 30;
         },
 
         _onReading: function(e) {
@@ -65,8 +89,18 @@
                 z = acc.z,
                 xy = Math.sqrt(x*x + y*y);
 
+            // geo.speed = 10;
+
             this.speed = geo.speed ? geo.speed*3.6 : 0;
             this.speed = Math.round(this.speed * 100)/100;
+
+            reading.ratio = this.speed ? (Math.abs(z) / this.speed)*10 : 0;
+
+            this._readings.push(reading);
+
+            if(this._readings.length > 30) {
+                this._readings.shift();
+            }
 
             this._readingsXY.push({
                 x: reading.timestamp,
@@ -75,7 +109,12 @@
 
             this._readingsZ.push({
                 x: reading.timestamp,
-                y: z
+                y: Math.abs(z)
+            });
+
+            this._readingsRatio.push({
+                x: reading.timestamp,
+                y: reading.ratio - 10
             });
 
             if(this._readingsXY.length > 100) {
@@ -86,13 +125,41 @@
                 this._readingsZ.shift();
             }
 
-            this.chart.draw([this._readingsXY, this._readingsZ]);
+            if(this._readingsRatio.length > 100) {
+                this._readingsRatio.shift();
+            }
+
+            this.chart.draw([this._readingsXY, this._readingsZ, this._readingsRatio]);
+
+            var truncatedArr = this._readingsZ.slice(-30),
+                index = 0,
+                maxZ = 0;
+
+            for(var i = 0; i < truncatedArr.length; i++) {
+                var currZ = truncatedArr[i].y;
+
+                if(currZ >= maxZ) {
+                    index = i;
+                    maxZ = currZ;
+                }
+            }
+
+            var readingAtIndex = this._readings[index],
+                geoAtIndex = readingAtIndex.position || {},
+                speedAtIndex = geoAtIndex.speed || 0;
+
+            this.maxZ = {
+                force: Math.round(maxZ*100)/100,
+                speed: Math.round(speedAtIndex*3.6*100)/100,
+                ratio: Math.round(readingAtIndex.ratio*100)/100
+            }
         },
 
         startRide: function() {
             this.recorder.startRecording();
             this._readingsXY = [];
             this._readingsZ = [];
+            this._readingsRatio = [];
             this.recorder.addEventListener('reading', this._onReading.bind(this), false);
             this.rideId = this.recorder.rideId;
         },
